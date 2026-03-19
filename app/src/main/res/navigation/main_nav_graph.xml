@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/generate_palette">
+
+    <fragment
+        android:id="@+id/generate_palette"
+        android:label="@string/label_generate_palette"
+        android:name="edu.oregonstate.cs492.ColorPaletteApp.ui.GeneratePaletteFragment">
+<!--        <action-->
+<!--            android:id="@+id/navigate_to_five_day_forecast"-->
+<!--            app:destination="@id/five_day_forecast"/>-->
+    </fragment>
+
+</navigation>
