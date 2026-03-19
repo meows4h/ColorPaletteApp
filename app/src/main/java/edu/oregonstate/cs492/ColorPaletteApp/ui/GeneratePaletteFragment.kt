@@ -1,5 +1,6 @@
 package edu.oregonstate.cs492.ColorPaletteApp.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -10,9 +11,19 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import edu.oregonstate.cs492.ColorPaletteApp.data.Palette
+import androidx.core.view.MenuHost
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import androidx.core.view.MenuProvider
+import androidx.navigation.fragment.findNavController
+import androidx.lifecycle.Lifecycle
 
 class GeneratePaletteFragment : Fragment(R.layout.fragment_generate) {
     private val viewModel: ColorSetViewModel by viewModels()
+    private val saveViewModel: PaletteViewModel by viewModels()
+
     private lateinit var colorSetAdapter: ColorSetAdapter
 
     private lateinit var colorListRV: RecyclerView
@@ -71,18 +82,41 @@ class GeneratePaletteFragment : Fragment(R.layout.fragment_generate) {
         }
 
         saveButton.setOnClickListener {
-
+            saveViewModel.addPalette(Palette(colors=viewModel.colorSet.value?.colors ?: listOf("#000000","#000000","#000000","#000000","#000000")))
         }
 
         shareButton.setOnClickListener {
-
+            share(viewModel)
         }
+
+        val menuHost: MenuHost = requireActivity() as MenuHost
+        menuHost.addMenuProvider(
+            object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.generate_menu, menu)
+                }
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    return when (menuItem.itemId) {
+                        R.id.action_palettes -> {
+                            val directions = GeneratePaletteFragmentDirections.navigateToPalettes()
+                            findNavController().navigate(directions)
+                            true
+                        }
+                        else -> false
+                    }
+                }
+
+            },
+            viewLifecycleOwner,
+            Lifecycle.State.STARTED
+        )
 
     }
 
     override fun onResume() {
         super.onResume()
-        generateNewPalette()
+        // generateNewPalette()
     }
 
     private fun generateNewPalette() {
@@ -94,5 +128,17 @@ class GeneratePaletteFragment : Fragment(R.layout.fragment_generate) {
         }
 
         viewModel.loadColorPalette(input, "default")
+    }
+
+    private fun share(viewModel: ColorSetViewModel) {
+        if (viewModel.colorSet.value == null) {
+            return
+        }
+        val shareText = "Check out this color palette: ${viewModel.colorSet.value!!.colors.joinToString(", ")}"
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, shareText)
+        }
+        startActivity(Intent.createChooser(intent, "Share Palette"))
     }
 }

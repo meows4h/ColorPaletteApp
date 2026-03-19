@@ -14,6 +14,11 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.appbar.MaterialToolbar
 import edu.oregonstate.cs492.ColorPaletteApp.R
 import androidx.preference.PreferenceManager
+import androidx.core.view.MenuProvider
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import androidx.lifecycle.Lifecycle
 
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfig: AppBarConfiguration
@@ -40,7 +45,29 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(appBar)
         setupActionBarWithNavController(navController, appBarConfig)
 
+        addMenuProvider(
+            object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.main_menu, menu)
+                }
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    return when (menuItem.itemId) {
+                        R.id.action_settings -> {
+                            findNavController(R.id.nav_host_fragment).navigate(R.id.settings)
+                            true
+                        }
+                        else -> false
+                    }
+                }
+
+            },
+            this,
+            Lifecycle.State.STARTED
+        )
     }
+
+
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment)

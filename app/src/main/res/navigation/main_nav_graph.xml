@@ -9,9 +9,22 @@
         android:id="@+id/generate_palette"
         android:label="@string/label_generate_palette"
         android:name="edu.oregonstate.cs492.ColorPaletteApp.ui.GeneratePaletteFragment">
-<!--        <action-->
-<!--            android:id="@+id/navigate_to_five_day_forecast"-->
-<!--            app:destination="@id/five_day_forecast"/>-->
+        <action
+            android:id="@+id/navigate_to_palettes"
+            app:destination="@id/palettes"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/palettes"
+        android:label="@string/label_palettes"
+        android:name="edu.oregonstate.cs492.ColorPaletteApp.ui.SavedPaletteFragment">
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/settings"
+        android:label="@string/label_settings"
+        android:name="edu.oregonstate.cs492.ColorPaletteApp.ui.SettingsFragment">
     </fragment>
 
 </navigation>
