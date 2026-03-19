@@ -1,6 +1,7 @@
 package edu.oregonstate.cs492.ColorPaletteApp.ui
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -19,12 +20,15 @@ import android.view.MenuItem
 import androidx.core.view.MenuProvider
 import androidx.navigation.fragment.findNavController
 import androidx.lifecycle.Lifecycle
+import androidx.preference.PreferenceManager
 
 class GeneratePaletteFragment : Fragment(R.layout.fragment_generate) {
     private val viewModel: ColorSetViewModel by viewModels()
     private val saveViewModel: PaletteViewModel by viewModels()
 
     private lateinit var colorSetAdapter: ColorSetAdapter
+    private lateinit var sharedPrefs: SharedPreferences
+    private lateinit var model: String
 
     private lateinit var colorListRV: RecyclerView
     private lateinit var loadingErrorTV: TextView
@@ -37,6 +41,9 @@ class GeneratePaletteFragment : Fragment(R.layout.fragment_generate) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         colorSetAdapter = ColorSetAdapter(viewModel)
+
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        model = sharedPrefs.getString(getString(R.string.pref_model_key), "default")?: "default"
 
         loadingErrorTV = view.findViewById(R.id.tv_loading_error)
         loadingIndicator = view.findViewById(R.id.loading_indicator)
@@ -78,7 +85,7 @@ class GeneratePaletteFragment : Fragment(R.layout.fragment_generate) {
         }
 
         shuffleButton.setOnClickListener {
-            viewModel.loadColorPalette(viewModel.colorSet.value?.colors ?: listOf("N", "N", "N", "N", "N"), "default")
+            viewModel.loadColorPalette(viewModel.colorSet.value?.colors ?: listOf("N", "N", "N", "N", "N"), model)
         }
 
         saveButton.setOnClickListener {
@@ -116,7 +123,7 @@ class GeneratePaletteFragment : Fragment(R.layout.fragment_generate) {
 
     override fun onResume() {
         super.onResume()
-        // generateNewPalette()
+        model = sharedPrefs.getString(getString(R.string.pref_model_key), "default")?: "default"
     }
 
     private fun generateNewPalette() {

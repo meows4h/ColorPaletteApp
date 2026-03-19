@@ -16,4 +16,8 @@
     <string name="button_copy">Copy</string>
     <string name="button_edit">Edit</string>
     <string name="button_delete">Delete</string>
+
+    <string name="pref_model_key">pref_model</string>
+    <string name="pref_model_title">ColorMind Model</string>
+    <string name="pref_model_default">default</string>
 </resources>

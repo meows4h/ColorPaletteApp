@@ -2,4 +2,13 @@
 <androidx.preference.PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ListPreference
+        android:key="@string/pref_model_key"
+        android:title="@string/pref_model_title"
+        android:defaultValue="@string/pref_model_default"
+        android:entries="@array/pref_model_entries_default"
+        android:entryValues="@array/pref_model_values_default"
+        app:useSimpleSummaryProvider="true" />
+
 </androidx.preference.PreferenceScreen>

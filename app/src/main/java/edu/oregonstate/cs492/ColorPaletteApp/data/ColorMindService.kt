@@ -6,12 +6,17 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.POST
 import retrofit2.http.Body
+import retrofit2.http.GET
 
 interface ColorMindService {
     @POST("api/")
     suspend fun loadColorPalette(
         @Body request: ColorMindRequest
     ) : Response<ColorSet>
+
+    @GET("list/")
+    suspend fun loadModelList()
+    : Response<ColorMindModel>
 
     companion object {
         private const val BASE_URL = "http://colormind.io/"
