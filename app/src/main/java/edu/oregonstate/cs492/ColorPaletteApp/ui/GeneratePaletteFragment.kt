@@ -2,6 +2,7 @@ package edu.oregonstate.cs492.ColorPaletteApp.ui
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import edu.oregonstate.cs492.ColorPaletteApp.R
 import androidx.fragment.app.Fragment
@@ -12,14 +13,19 @@ import com.google.android.material.progressindicator.CircularProgressIndicator
 
 class GeneratePaletteFragment : Fragment(R.layout.fragment_generate) {
     private val viewModel: ColorSetViewModel by viewModels()
-    private val colorSetAdapter = ColorSetAdapter()
+    private lateinit var colorSetAdapter: ColorSetAdapter
 
     private lateinit var colorListRV: RecyclerView
     private lateinit var loadingErrorTV: TextView
     private lateinit var loadingIndicator: CircularProgressIndicator
 
+    private lateinit var shuffleButton: Button
+    private lateinit var saveButton: Button
+    private lateinit var shareButton: Button
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        colorSetAdapter = ColorSetAdapter(viewModel)
 
         loadingErrorTV = view.findViewById(R.id.tv_loading_error)
         loadingIndicator = view.findViewById(R.id.loading_indicator)
@@ -29,9 +35,14 @@ class GeneratePaletteFragment : Fragment(R.layout.fragment_generate) {
         colorListRV.setHasFixedSize(true)
         colorListRV.adapter = colorSetAdapter
 
+        shuffleButton = view.findViewById(R.id.button_shuffle)
+        saveButton = view.findViewById(R.id.button_save)
+        shareButton = view.findViewById(R.id.button_share)
+
         viewModel.colorSet.observe(viewLifecycleOwner) { colorSet ->
+            val locks = viewModel.locks.value
             if (colorSet != null) {
-                colorSetAdapter.updateColors(colorSet)
+                colorSetAdapter.updateColors(colorSet, locks)
                 colorListRV.visibility = View.VISIBLE
                 colorListRV.scrollToPosition(0)
             }
@@ -54,10 +65,34 @@ class GeneratePaletteFragment : Fragment(R.layout.fragment_generate) {
                 colorListRV.visibility = View.INVISIBLE
             }
         }
+
+        shuffleButton.setOnClickListener {
+            viewModel.loadColorPalette(viewModel.colorSet.value?.colors ?: listOf("N", "N", "N", "N", "N"), "default")
+        }
+
+        saveButton.setOnClickListener {
+
+        }
+
+        shareButton.setOnClickListener {
+
+        }
+
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.loadColorPalette(listOf("N", "N", "N", "N", "N"), "default")
+        generateNewPalette()
+    }
+
+    private fun generateNewPalette() {
+        val currentColors = viewModel.colorSet.value?.colors ?: listOf("N", "N", "N", "N", "N")
+        val currentLocks = viewModel.locks.value ?: listOf(false, false, false, false, false)
+
+        val input = currentColors.mapIndexed { index, color ->
+            if (currentLocks[index]) color else "N"
+        }
+
+        viewModel.loadColorPalette(input, "default")
     }
 }

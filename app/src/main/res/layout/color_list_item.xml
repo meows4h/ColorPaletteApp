@@ -29,6 +29,20 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_lock"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="12dp"
+            app:icon="@drawable/ic_unlocked"
+            app:iconTint="@android:color/black"
+            app:iconPadding="0dp"
+            app:backgroundTint="?attr/colorSurface"
+            app:cornerRadius="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

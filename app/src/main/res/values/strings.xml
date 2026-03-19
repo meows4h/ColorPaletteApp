@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">ColorApp</string>
-    <string name="loading_error">Unable to fetch forecast data.  Error message: %1$s</string>
+    <string name="loading_error">Error message: %1$s</string>
 
     <string name="label_generate_palette">Generate Palette</string>
 

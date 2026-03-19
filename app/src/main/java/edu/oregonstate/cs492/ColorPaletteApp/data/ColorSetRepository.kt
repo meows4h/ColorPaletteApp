@@ -16,6 +16,10 @@ class ColorSetRepository (
         storedLocks!![idx] = lock
     }
 
+    fun getLocks() : List<Boolean>? {
+        return storedLocks
+    }
+
     fun getPalette() : ColorSet? {
         storedPalette = ColorSet(tempPalette!!)
         return storedPalette
@@ -51,11 +55,22 @@ class ColorSetRepository (
                     }
                 }
 
-                val response = service.loadColorPalette(ColorMindRequest(processedInput, model))
+                // if a value is not locked, we pass in N for a new color
+                val lockCheckInput = processedInput.toMutableList()
+                val locks = storedLocks ?: listOf()
+
+                // this all could probably be cleaner but this works i guess
+                for (idx in locks.indices) {
+                    if (!locks[idx]) {
+                        lockCheckInput[idx] = "N"
+                    }
+                }
+
+                val response = service.loadColorPalette(ColorMindRequest(lockCheckInput, model))
                 if (response.isSuccessful) {
                     if (storedLocks == null) {
-                        storedLocks = MutableList(storedPalette!!.colors.size) { false }
                         storedPalette = response.body()
+                        storedLocks = MutableList(storedPalette!!.colors.size) { false }
                         tempPalette = storedPalette!!.colors.toMutableList()
                     } else {
                         for (idx in storedLocks!!.indices) {
