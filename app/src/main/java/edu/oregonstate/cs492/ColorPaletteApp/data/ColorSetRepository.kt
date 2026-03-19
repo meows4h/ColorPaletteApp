@@ -8,7 +8,18 @@ class ColorSetRepository (
     private val service: ColorMindService,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
+    private var tempPalette: MutableList<String>? = null
     private var storedPalette: ColorSet? = null
+    private var storedLocks: MutableList<Boolean>? = null
+
+    fun setLock(idx: Int, lock: Boolean) {
+        storedLocks!![idx] = lock
+    }
+
+    fun getPalette() : ColorSet? {
+        storedPalette = ColorSet(tempPalette!!)
+        return storedPalette
+    }
 
     suspend fun loadColorPalette(
         input: List<String>,
@@ -42,7 +53,18 @@ class ColorSetRepository (
 
                 val response = service.loadColorPalette(ColorMindRequest(processedInput, model))
                 if (response.isSuccessful) {
-                    storedPalette = response.body()
+                    if (storedLocks == null) {
+                        storedLocks = MutableList(storedPalette!!.colors.size) { false }
+                        storedPalette = response.body()
+                        tempPalette = storedPalette!!.colors.toMutableList()
+                    } else {
+                        for (idx in storedLocks!!.indices) {
+                            if (!storedLocks!![idx]) {
+                                tempPalette!![idx] = response.body()!!.colors[idx]
+                            }
+                        }
+                    }
+                    storedPalette = ColorSet(tempPalette!!)
                     Result.success(storedPalette)
                 } else {
                     Result.failure(Exception("API Error: ${response.code()} - ${response.errorBody()?.string()}"))
