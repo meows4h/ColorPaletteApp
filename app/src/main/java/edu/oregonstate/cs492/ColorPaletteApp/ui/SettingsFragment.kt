@@ -1,6 +1,7 @@
 package edu.oregonstate.cs492.ColorPaletteApp.ui
 
 import android.os.Bundle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -32,6 +33,32 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
         }
 
+        // clear database preference
+        val clearPref = findPreference<Preference>("pref_clear_db")
+        clearPref?.setOnPreferenceClickListener {
+            androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Clear All Palettes?")
+                .setMessage("This will permanently delete all saved palettes.")
+                .setPositiveButton("Clear") { _, _ ->
+                    val vm = ViewModelProvider(requireActivity())[PaletteViewModel::class.java]
+                    vm.deleteAll()
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+            true
+        }
+
+        // theme preference
+        findPreference<ListPreference>("pref_theme")?.setOnPreferenceChangeListener { _, newValue ->
+            val mode = when (newValue as String) {
+                "light" -> androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+                "dark"  -> androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+                else    -> androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            }
+            androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(mode)
+            true
+        }
+
         // creating the list of models for the list preference
         // based on the GET request of the service
         lifecycleScope.launch {
@@ -40,12 +67,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 val response = service.loadModelList()
                 if (response.isSuccessful) {
                     val models = response.body()?.models ?: listOf("default")
-                    
+
                     val entries = models.map { formatModelName(it) }
 
                     modelPreference?.entries = entries.toTypedArray()
                     modelPreference?.entryValues = models.toTypedArray()
-                    
+
                     if (modelPreference?.value == null) {
                         modelPreference?.value = "default"
                     }

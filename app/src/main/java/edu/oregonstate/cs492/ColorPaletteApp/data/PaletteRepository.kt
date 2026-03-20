@@ -8,6 +8,9 @@ class PaletteRepository(private val dao: PaletteDao) {
     suspend fun delete(palette: Palette) {
         dao.delete(palette)
     }
+    suspend fun deleteAll() {
+        dao.deleteAll()
+    }
 
     fun getAll() = dao.getAll()
 }

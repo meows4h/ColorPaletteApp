@@ -10,5 +10,9 @@
         android:entries="@array/pref_model_entries_default"
         android:entryValues="@array/pref_model_values_default"
         app:useSimpleSummaryProvider="true" />
+    <Preference
+        android:key="pref_clear_db"
+        android:title="Clear Saved Palettes"
+        android:summary="Delete all saved palettes from the database" />
 
 </androidx.preference.PreferenceScreen>

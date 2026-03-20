@@ -17,4 +17,7 @@ interface PaletteDao {
 
     @Query("SELECT * FROM palette")
     fun getAll(): Flow<List<Palette>>
+
+    @Query("DELETE FROM palette")
+    suspend fun deleteAll()
 }
