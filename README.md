@@ -44,4 +44,4 @@ A mobile application that uses the [Colormind API](http://colormind.io/api-acces
 - Exporting / Sharing palettes as an image
 - Clearing out SQLite database via settings or other buttons
 - Modifying the UI color theme via preferences
-- Adding / Removing total colors, assuming ColorMind supports generating more than 5 colors
+- Adding / Removing total colors, assuming Colormind supports generating more than 5 colors
