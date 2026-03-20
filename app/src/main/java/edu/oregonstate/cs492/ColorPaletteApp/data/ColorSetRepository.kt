@@ -13,7 +13,11 @@ class ColorSetRepository (
     private var storedLocks: MutableList<Boolean>? = null
 
     fun setLock(idx: Int, lock: Boolean) {
-        storedLocks!![idx] = lock
+        storedLocks?.let {
+            if (idx in it.indices) {
+                it[idx] = lock
+            }
+        }
     }
 
     fun getLocks() : List<Boolean>? {
@@ -21,8 +25,25 @@ class ColorSetRepository (
     }
 
     fun getPalette() : ColorSet? {
-        storedPalette = ColorSet(tempPalette!!)
+        tempPalette?.let {
+            storedPalette = ColorSet(it)
+        }
         return storedPalette
+    }
+
+    fun updateColor(idx: Int, color: String) {
+        tempPalette?.let {
+            if (idx in it.indices) {
+                it[idx] = color
+                storedPalette = ColorSet(it)
+            }
+        }
+    }
+
+    fun setNewPalette(colors: List<String>) {
+        tempPalette = colors.toMutableList()
+        storedPalette = ColorSet(tempPalette!!)
+        storedLocks = MutableList(colors.size) { false }
     }
 
     suspend fun loadColorPalette(
@@ -61,26 +82,31 @@ class ColorSetRepository (
 
                 // this all could probably be cleaner but this works i guess
                 for (idx in locks.indices) {
-                    if (!locks[idx]) {
+                    if (idx < lockCheckInput.size && !locks[idx]) {
                         lockCheckInput[idx] = "N"
                     }
                 }
 
                 val response = service.loadColorPalette(ColorMindRequest(lockCheckInput, model))
                 if (response.isSuccessful) {
-                    if (storedLocks == null) {
-                        storedPalette = response.body()
-                        storedLocks = MutableList(storedPalette!!.colors.size) { false }
-                        tempPalette = storedPalette!!.colors.toMutableList()
-                    } else {
-                        for (idx in storedLocks!!.indices) {
-                            if (!storedLocks!![idx]) {
-                                tempPalette!![idx] = response.body()!!.colors[idx]
+                    val body = response.body()
+                    if (body != null) {
+                        if (storedLocks == null) {
+                            storedPalette = body
+                            storedLocks = MutableList(body.colors.size) { false }
+                            tempPalette = body.colors.toMutableList()
+                        } else {
+                            for (idx in storedLocks!!.indices) {
+                                if (!storedLocks!![idx] && idx < body.colors.size) {
+                                    tempPalette!![idx] = body.colors[idx]
+                                }
                             }
                         }
+                        storedPalette = ColorSet(tempPalette!!)
+                        Result.success(storedPalette)
+                    } else {
+                        Result.failure(Exception("Empty response body"))
                     }
-                    storedPalette = ColorSet(tempPalette!!)
-                    Result.success(storedPalette)
                 } else {
                     Result.failure(Exception("API Error: ${response.code()} - ${response.errorBody()?.string()}"))
                 }

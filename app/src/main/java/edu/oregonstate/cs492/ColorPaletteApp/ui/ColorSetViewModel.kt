@@ -53,4 +53,14 @@ class ColorSetViewModel: ViewModel() {
         }
     }
 
+    fun updateColor(idx: Int, color: String) {
+        repository.updateColor(idx, color)
+        _colorSet.value = repository.getPalette()
+    }
+
+    fun setNewPalette(colors: List<String>) {
+        repository.setNewPalette(colors)
+        _colorSet.value = repository.getPalette()
+        _locks.value = repository.getLocks()
+    }
 }

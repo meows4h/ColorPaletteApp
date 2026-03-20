@@ -6,6 +6,7 @@
     <string name="label_palettes">Saved Palettes</string>
     <string name="label_settings">Settings</string>
     <string name="label_import">Import Color</string>
+    <string name="label_image_picker">Image to pick color from</string>
 
     <string name="action_settings">Settings</string>
     <string name="action_palettes">Palettes</string>
@@ -16,6 +17,8 @@
     <string name="button_copy">Copy</string>
     <string name="button_edit">Edit</string>
     <string name="button_delete">Delete</string>
+    <string name="button_select">Select Image</string>
+    <string name="button_confirm">Confirm Color</string>
 
     <string name="pref_model_key">pref_model</string>
     <string name="pref_model_title">ColorMind Model</string>

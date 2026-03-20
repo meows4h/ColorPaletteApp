@@ -20,6 +20,7 @@ fragment = "1.8.9"
 navigation = "2.9.7"
 preference = "1.2.1"
 room = "2.8.4"
+palette = "1.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -49,6 +50,7 @@ retrofit2-convertermoshi = { group="com.squareup.retrofit2", name = "converter-m
 moshi = { group = "com.squareup.moshi", name = "moshi", version.ref = "moshi" }
 moshi-codegen = { group = "com.squareup.moshi", name = "moshi-kotlin-codegen", version.ref = "moshi" }
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+palette = { group = "androidx.palette", name = "palette", version.ref = "palette" }
 
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines"}
 

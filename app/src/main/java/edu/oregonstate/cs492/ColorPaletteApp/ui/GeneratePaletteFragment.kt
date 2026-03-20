@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.TextView
 import edu.oregonstate.cs492.ColorPaletteApp.R
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,7 +24,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.preference.PreferenceManager
 
 class GeneratePaletteFragment : Fragment(R.layout.fragment_generate) {
-    private val viewModel: ColorSetViewModel by viewModels()
+    // using activityViewModels instead to share the same viewModel between the two fragments
+    // this is to port the color over from the import screen to the generate screen
+    private val viewModel: ColorSetViewModel by activityViewModels()
     private val saveViewModel: PaletteViewModel by viewModels()
 
     private lateinit var colorSetAdapter: ColorSetAdapter
@@ -40,7 +43,10 @@ class GeneratePaletteFragment : Fragment(R.layout.fragment_generate) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        colorSetAdapter = ColorSetAdapter(viewModel)
+        colorSetAdapter = ColorSetAdapter(viewModel) { index ->
+            val directions = GeneratePaletteFragmentDirections.navigateToImportColor(index)
+            findNavController().navigate(directions)
+        }
 
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
         model = sharedPrefs.getString(getString(R.string.pref_model_key), "default")?: "default"
@@ -62,7 +68,6 @@ class GeneratePaletteFragment : Fragment(R.layout.fragment_generate) {
             if (colorSet != null) {
                 colorSetAdapter.updateColors(colorSet, locks)
                 colorListRV.visibility = View.VISIBLE
-                colorListRV.scrollToPosition(0)
             }
         }
 
@@ -124,17 +129,6 @@ class GeneratePaletteFragment : Fragment(R.layout.fragment_generate) {
     override fun onResume() {
         super.onResume()
         model = sharedPrefs.getString(getString(R.string.pref_model_key), "default")?: "default"
-    }
-
-    private fun generateNewPalette() {
-        val currentColors = viewModel.colorSet.value?.colors ?: listOf("N", "N", "N", "N", "N")
-        val currentLocks = viewModel.locks.value ?: listOf(false, false, false, false, false)
-
-        val input = currentColors.mapIndexed { index, color ->
-            if (currentLocks[index]) color else "N"
-        }
-
-        viewModel.loadColorPalette(input, "default")
     }
 
     private fun share(viewModel: ColorSetViewModel) {

@@ -9,13 +9,16 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.oregonstate.cs492.ColorPaletteApp.R
 
 class SavedPaletteFragment : Fragment(R.layout.fragment_palettes) {
     private val viewModel: PaletteViewModel by viewModels()
+    private val colorSetViewModel: ColorSetViewModel by activityViewModels()
     private lateinit var adapter: SavedPaletteAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -26,8 +29,8 @@ class SavedPaletteFragment : Fragment(R.layout.fragment_palettes) {
 
         adapter = SavedPaletteAdapter(
             onEditClick = { palette ->
-                // this needs to handle moving the colors over into the main generate page
-                Toast.makeText(requireContext(), "Edit: ${palette.colors}", Toast.LENGTH_SHORT).show()
+                colorSetViewModel.setNewPalette(palette.colors)
+                findNavController().navigateUp()
             },
             onShareClick = { palette ->
                 val shareText = "Check out this color palette: ${palette.colors.joinToString(", ")}"

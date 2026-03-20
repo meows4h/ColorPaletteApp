@@ -4,14 +4,17 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import edu.oregonstate.cs492.ColorPaletteApp.R
 import edu.oregonstate.cs492.ColorPaletteApp.data.ColorSet
 import com.google.android.material.button.MaterialButton
 
 class ColorSetAdapter(
-    private val viewModel: ColorSetViewModel
+    private val viewModel: ColorSetViewModel,
+    private val onAddClick: (Int) -> Unit
 ) : RecyclerView.Adapter<ColorSetAdapter.ViewHolder>() {
     private var colorDisplay: List<String> = listOf()
     private var lockDisplay: List<Boolean> = listOf()
@@ -37,15 +40,17 @@ class ColorSetAdapter(
         holder.bind(color,
             lock,
             position,
-            viewModel)
+            viewModel,
+            onAddClick)
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val hexTV: TextView = itemView.findViewById(R.id.tv_hex)
         private val colorSwatch: View = itemView.findViewById(R.id.view_color_swatch)
         private val lockButton: MaterialButton = itemView.findViewById(R.id.button_lock)
+        private val addButton: MaterialButton = itemView.findViewById(R.id.button_add)
 
-        fun bind(colorHex: String, lockState: Boolean, idx: Int, viewModel: ColorSetViewModel) {
+        fun bind(colorHex: String, lockState: Boolean, idx: Int, viewModel: ColorSetViewModel, onAddClick: (Int) -> Unit) {
             hexTV.text = colorHex
 
             val lockIcon = if (lockState) {
@@ -63,6 +68,30 @@ class ColorSetAdapter(
                     R.drawable.ic_unlocked
                 }
                 lockButton.setIconResource(tempIcon)
+            }
+
+            addButton.setOnClickListener {
+                onAddClick(idx)
+            }
+
+            hexTV.setOnClickListener {
+                val context = itemView.context
+                val input = EditText(context)
+                input.setText(colorHex)
+
+                AlertDialog.Builder(context)
+                    .setTitle("Edit Hex Code")
+                    .setView(input)
+                    .setPositiveButton("OK") { _, _ ->
+                        val newHex = input.text.toString()
+                        if (newHex.startsWith("#") && (newHex.length == 7)) {
+                            viewModel.updateColor(idx, newHex)
+                        } else if (newHex.length == 6) {
+                            viewModel.updateColor(idx, "#$newHex")
+                        }
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
             }
 
             try {
