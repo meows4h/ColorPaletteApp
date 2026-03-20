@@ -94,6 +94,87 @@ class ColorSetAdapter(
                     .show()
             }
 
+            colorSwatch.setOnClickListener {
+                val context = itemView.context
+                val currentColor = try { Color.parseColor(colorHex) } catch (e: Exception) { Color.GRAY }
+                val r = Color.red(currentColor)
+                val g = Color.green(currentColor)
+                val b = Color.blue(currentColor)
+
+                val dialogView = android.widget.LinearLayout(context).apply {
+                    orientation = android.widget.LinearLayout.VERTICAL
+                    setPadding(48, 32, 48, 16)
+                }
+
+                val preview = View(context).apply {
+                    layoutParams = android.widget.LinearLayout.LayoutParams(
+                        android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 120
+                    )
+                    setBackgroundColor(currentColor)
+                }
+
+                fun makeSliderRow(label: String, value: Int): Pair<android.widget.SeekBar, android.widget.TextView> {
+                    val row = android.widget.LinearLayout(context).apply {
+                        orientation = android.widget.LinearLayout.HORIZONTAL
+                        layoutParams = android.widget.LinearLayout.LayoutParams(
+                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                        )
+                    }
+                    val lbl = android.widget.TextView(context).apply {
+                        text = label
+                        layoutParams = android.widget.LinearLayout.LayoutParams(40, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT)
+                    }
+                    val seekBar = android.widget.SeekBar(context).apply {
+                        max = 255
+                        progress = value
+                        layoutParams = android.widget.LinearLayout.LayoutParams(0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                    }
+                    val valLabel = android.widget.TextView(context).apply {
+                        text = value.toString()
+                        layoutParams = android.widget.LinearLayout.LayoutParams(60, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT)
+                    }
+                    row.addView(lbl); row.addView(seekBar); row.addView(valLabel)
+                    return Pair(seekBar, valLabel)
+                }
+
+                val (rSeek, rVal) = makeSliderRow("R", r)
+                val (gSeek, gVal) = makeSliderRow("G", g)
+                val (bSeek, bVal) = makeSliderRow("B", b)
+
+                dialogView.addView(preview)
+                dialogView.addView(rSeek.parent as android.view.View)
+                dialogView.addView(gSeek.parent as android.view.View)
+                dialogView.addView(bSeek.parent as android.view.View)
+
+                fun updatePreview() {
+                    val newColor = Color.rgb(rSeek.progress, gSeek.progress, bSeek.progress)
+                    preview.setBackgroundColor(newColor)
+                    rVal.text = rSeek.progress.toString()
+                    gVal.text = gSeek.progress.toString()
+                    bVal.text = bSeek.progress.toString()
+                }
+
+                val listener = object : android.widget.SeekBar.OnSeekBarChangeListener {
+                    override fun onProgressChanged(s: android.widget.SeekBar?, p: Int, u: Boolean) = updatePreview()
+                    override fun onStartTrackingTouch(s: android.widget.SeekBar?) {}
+                    override fun onStopTrackingTouch(s: android.widget.SeekBar?) {}
+                }
+                rSeek.setOnSeekBarChangeListener(listener)
+                gSeek.setOnSeekBarChangeListener(listener)
+                bSeek.setOnSeekBarChangeListener(listener)
+
+                AlertDialog.Builder(context)
+                    .setTitle("Pick Color")
+                    .setView(dialogView)
+                    .setPositiveButton("OK") { _, _ ->
+                        val newHex = "#%02X%02X%02X".format(rSeek.progress, gSeek.progress, bSeek.progress)
+                        viewModel.updateColor(idx, newHex)
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            }
+
             try {
                 colorSwatch.setBackgroundColor(Color.parseColor(colorHex))
             } catch (e: IllegalArgumentException) {
